@@ -22,9 +22,11 @@ public class MainManager : MonoBehaviour
     private int m_Points;
     private bool m_GameOver = false;
     private string currentPlayer;
+    private int currentPlayerHighScore = 0;
     private string playerName;
     private int playerHighScore;
-    private Dictionary<string, int> playersInfo = new Dictionary<string, int>();
+    private List<PlayerInfo> playersInfo;
+    private SaveData data;
 
     public static MainManager Instance;
 
@@ -98,7 +100,6 @@ public class MainManager : MonoBehaviour
     public void VariablesInit(){
         ball = GameObject.FindWithTag("Ball").GetComponent<Rigidbody>();
         gameOverText = GameObject.FindWithTag("Game Over Text").GetComponent<Text>();
-        Debug.Log("Game Over Text = " + gameOverText.text);
         scoreText = GameObject.FindWithTag("Score Text").GetComponent<Text>();
         highScoreText = GameObject.FindWithTag("High Score Text").GetComponent<Text>();
         highScoreText.text = "Best Score : " + playerName + " : " + playerHighScore;
@@ -132,46 +133,89 @@ public class MainManager : MonoBehaviour
             playerName = currentPlayer;
             highScoreText.text = "Best Score : " + playerName + " : " + playerHighScore;
         }
+        if(m_Points > currentPlayerHighScore){
+            currentPlayerHighScore = m_Points;
+        }
         SavePlayerInfo();
     }
 
     [Serializable]
-    class SaveData{
-        public Dictionary<string, int> playersInfo = new Dictionary<string, int>();
+    class PlayerInfo{
+        public string playerName;
+        public int highScore;
+
+        // public PlayerInfo(string playerName, int highScore)
+        // {
+        //     this.playerName = playerName;
+        //     this.highScore = highScore;
+        // }
+
+        // public string GetPlayerName(){
+        //     return playerName;
+        // }
+        // public int GetPlayerHighScore(){
+        //     return highScore;
+        // }
+        // public void SetPlayerName(string value){
+        //     playerName = value;
+        // }
+        // public void SetPlayerHighScore(int value){
+        //     highScore = value;
+        // }
+
     }
 
+    [Serializable]
+    class SaveData {
+        public List<PlayerInfo> playersInfo = new List<PlayerInfo>();
+    }
 
     public void LoadPlayerInfo()
     {
         string path = Application.persistentDataPath + "/savefile.json";
         if(File.Exists(path)){
             string json = File.ReadAllText(path);
-            SaveData data = JsonUtility.FromJson<SaveData>(json);
+            data = JsonUtility.FromJson<SaveData>(json);
+            
+            // playersInfo = data.playersInfo;
 
+            // Debug.Log("data.playersInfo = " + data.playersInfo);
+            // Debug.Log("playersInfo = " + playersInfo);
             if(data.playersInfo.Count() == 0){
                 playerName = " ";
                 playerHighScore = 0;
             }
-            else if(data.playersInfo.Count() == 1){
-                playerName = data.playersInfo.Keys.Single();
-                playerHighScore = data.playersInfo.Values.Single();
-            }
             else{
-                KeyValuePair<string, int> keyValuePair = data.playersInfo.Aggregate((x, y) => x.Value > y.Value ? x : y);
-                playerName = keyValuePair.Key;
-                playerHighScore = keyValuePair.Value;
+                playerHighScore = data.playersInfo.Max(elem => elem.highScore);
+                playerName = data.playersInfo.Find(elem => elem.highScore == playerHighScore).playerName;
             }
-
             
         }
     }
 
     public void SavePlayerInfo(){
-        SaveData data = new SaveData();
+        // SaveData data = new SaveData();
 
         Debug.Log("saved at : " + Application.persistentDataPath + "/savefile.json");
-        Debug.Log("data.playersInfo[" + playerName + "] = " + playerHighScore);
-        data.playersInfo[playerName] = playerHighScore;
+
+        int saveIndex = data.playersInfo.FindIndex(elem => elem.playerName == currentPlayer);
+        if(saveIndex != -1){
+            if(currentPlayerHighScore > data.playersInfo[saveIndex].highScore){
+                data.playersInfo[saveIndex].highScore = currentPlayerHighScore;
+            }
+        }
+        else{
+            PlayerInfo playerInfo = new PlayerInfo();
+            playerInfo.highScore = currentPlayerHighScore;
+            playerInfo.playerName = currentPlayer;
+            data.playersInfo.Add(playerInfo);
+        }
+        Debug.Log("data.playersInfo = " + data.playersInfo);
+        foreach (PlayerInfo playerInfo in data.playersInfo){
+            Debug.Log("player info = " + playerInfo);
+        }
+        // Debug.Log("playersInfo = " + playersInfo);
+        // data.playersInfo = playersInfo;
         string json = JsonUtility.ToJson(data);
         //string json = JsonConvert.SerializeObject(data);
         File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
@@ -183,12 +227,18 @@ public class MainManager : MonoBehaviour
     public string GetPlayerName(){
         return currentPlayer;
     }
+    public void SetPlayerHighScore(int score){
+        currentPlayerHighScore = score;
+    }
+    public int GetPlayerHighScore(){
+        return currentPlayerHighScore;
+    }
 
     public void SetBestPlayerName(string name){
-        currentPlayer = name;
+        playerName = name;
     }
     public string GetBestPlayerName(){
-        return currentPlayer;
+        return playerName;
     }
 
     public void SetBestPlayerHighScore(int score){
