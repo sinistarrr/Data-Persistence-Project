@@ -25,7 +25,6 @@ public class MainManager : MonoBehaviour
     private int currentPlayerHighScore = 0;
     private string playerName;
     private int playerHighScore;
-    private List<PlayerInfo> playersInfo;
     private SaveData data;
 
     public static MainManager Instance;
@@ -143,13 +142,13 @@ public class MainManager : MonoBehaviour
     }
 
     [Serializable]
-    class PlayerInfo{
+    public class PlayerInfo{
         public string playerName;
         public int highScore;
     }
 
     [Serializable]
-    class SaveData {
+    public class SaveData {
         public List<PlayerInfo> playersInfo = new List<PlayerInfo>();
     }
 
@@ -216,5 +215,8 @@ public class MainManager : MonoBehaviour
     }
     public int GetBestPlayerHighScore(){
         return playerHighScore;
+    }
+    public SaveData GetData(){
+        return data;
     }
 }

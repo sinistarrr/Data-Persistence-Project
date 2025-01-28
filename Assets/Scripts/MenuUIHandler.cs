@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Collections;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -26,16 +28,22 @@ public class MenuUIHandler : MonoBehaviour
         
     }
 
-    public void StartNew(){
-        MainManager.Instance.SetPlayerName(inputFieldName.text);
-        Debug.Log("inputFieldName.text = " + inputFieldName.text);
-        Debug.Log("MainManager.Instance.GetPlayerName() = " + MainManager.Instance.GetPlayerName());
-        // SceneManager.LoadScene(1);
-        var op = SceneManager.LoadSceneAsync(1);
-        op.completed += (x) => {
-            Debug.Log("Loaded");
-            MainManager.Instance.VariablesInit();
-        };
+    public void StartNew(int sceneNumber){
+        switch(sceneNumber){
+            case 1:
+                var op = SceneManager.LoadSceneAsync(1);
+                op.completed += (x) => {
+                    MainManager.Instance.VariablesInit();
+                    MainManager.Instance.SetPlayerName(inputFieldName.text);
+                };
+                break;
+            case 2:
+                SceneManager.LoadSceneAsync(2);
+                break;
+            default:
+                Debug.Log("Error Couldn't load scene");
+                break;
+        }
     }
 
     public void Exit(){

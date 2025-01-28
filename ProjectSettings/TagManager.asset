@@ -8,6 +8,7 @@ TagManager:
   - Game Over Text
   - Score Text
   - High Score Text
+  - Leaderboard Content
   layers:
   - Default
   - TransparentFX
