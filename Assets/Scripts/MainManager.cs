@@ -20,7 +20,7 @@ public class MainManager : MonoBehaviour
     
     private bool m_Started = false;
     private int m_Points;
-    private bool m_GameOver = false;
+    private bool m_GameOver; // = false;
     private string currentPlayer;
     private int currentPlayerHighScore = 0;
     private string playerName;
@@ -103,6 +103,9 @@ public class MainManager : MonoBehaviour
         scoreText = GameObject.FindWithTag("Score Text").GetComponent<Text>();
         highScoreText = GameObject.FindWithTag("High Score Text").GetComponent<Text>();
         highScoreText.text = "Best Score : " + playerName + " : " + playerHighScore;
+        m_GameOver = false;
+        m_Started = false;
+        m_Points = 0;
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -143,26 +146,6 @@ public class MainManager : MonoBehaviour
     class PlayerInfo{
         public string playerName;
         public int highScore;
-
-        // public PlayerInfo(string playerName, int highScore)
-        // {
-        //     this.playerName = playerName;
-        //     this.highScore = highScore;
-        // }
-
-        // public string GetPlayerName(){
-        //     return playerName;
-        // }
-        // public int GetPlayerHighScore(){
-        //     return highScore;
-        // }
-        // public void SetPlayerName(string value){
-        //     playerName = value;
-        // }
-        // public void SetPlayerHighScore(int value){
-        //     highScore = value;
-        // }
-
     }
 
     [Serializable]
@@ -176,11 +159,7 @@ public class MainManager : MonoBehaviour
         if(File.Exists(path)){
             string json = File.ReadAllText(path);
             data = JsonUtility.FromJson<SaveData>(json);
-            
-            // playersInfo = data.playersInfo;
-
-            // Debug.Log("data.playersInfo = " + data.playersInfo);
-            // Debug.Log("playersInfo = " + playersInfo);
+        
             if(data.playersInfo.Count() == 0){
                 playerName = " ";
                 playerHighScore = 0;
@@ -194,8 +173,6 @@ public class MainManager : MonoBehaviour
     }
 
     public void SavePlayerInfo(){
-        // SaveData data = new SaveData();
-
         Debug.Log("saved at : " + Application.persistentDataPath + "/savefile.json");
 
         int saveIndex = data.playersInfo.FindIndex(elem => elem.playerName == currentPlayer);
@@ -210,14 +187,7 @@ public class MainManager : MonoBehaviour
             playerInfo.playerName = currentPlayer;
             data.playersInfo.Add(playerInfo);
         }
-        Debug.Log("data.playersInfo = " + data.playersInfo);
-        foreach (PlayerInfo playerInfo in data.playersInfo){
-            Debug.Log("player info = " + playerInfo);
-        }
-        // Debug.Log("playersInfo = " + playersInfo);
-        // data.playersInfo = playersInfo;
         string json = JsonUtility.ToJson(data);
-        //string json = JsonConvert.SerializeObject(data);
         File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
     }
 
