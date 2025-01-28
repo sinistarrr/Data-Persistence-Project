@@ -2,6 +2,7 @@ using System.Text;
 using TMPro;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LeaderboardHandler : MonoBehaviour
 {
@@ -18,5 +19,9 @@ public class LeaderboardHandler : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void BackToMenu(){
+        SceneManager.LoadScene(0);
     }
 }

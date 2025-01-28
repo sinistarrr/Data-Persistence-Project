@@ -17,7 +17,7 @@ public class MainManager : MonoBehaviour
     private Text scoreText;
     private Text highScoreText;
     private Text gameOverText;
-    
+    private float gameSpeed = 1;
     private bool m_Started = false;
     private int m_Points;
     private bool m_GameOver; // = false;
@@ -105,6 +105,7 @@ public class MainManager : MonoBehaviour
         m_GameOver = false;
         m_Started = false;
         m_Points = 0;
+        Time.timeScale = gameSpeed;
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -158,7 +159,7 @@ public class MainManager : MonoBehaviour
         if(File.Exists(path)){
             string json = File.ReadAllText(path);
             data = JsonUtility.FromJson<SaveData>(json);
-        
+            data.playersInfo.Sort((a, b) => b.highScore.CompareTo(a.highScore));
             if(data.playersInfo.Count() == 0){
                 playerName = " ";
                 playerHighScore = 0;
@@ -218,5 +219,9 @@ public class MainManager : MonoBehaviour
     }
     public SaveData GetData(){
         return data;
+    }
+
+    public void SetGameSpeed(float speed){
+        gameSpeed = speed;
     }
 }

@@ -40,6 +40,9 @@ public class MenuUIHandler : MonoBehaviour
             case 2:
                 SceneManager.LoadSceneAsync(2);
                 break;
+            case 3:
+                SceneManager.LoadSceneAsync(3);
+                break;
             default:
                 Debug.Log("Error Couldn't load scene");
                 break;
